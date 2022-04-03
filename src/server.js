@@ -1,60 +1,106 @@
 const express = require('express');
 const app = express()  //Executando express 
 const morgan = require('morgan')
+const cors = require('cors')
 const puppeteer = require('puppeteer');
+const urls = require('./urls.json') // 
+const port = 3000;
+const { buscarFechasyReemplazarlas } = require('./helpers/searchAndReplace')
 
-app.set('port', 3000)
-app.set('title', 'Test web-scrapping')
+
+let corsOptions = {
+    "origin": "*",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "preflightContinue": false,
+    "optionsSuccessStatus": 204
+  }
+
+let DataResults = [];
+
 app.use(morgan('dev'));
+app.use(cors());
 
-app.get('/', async (request, response) => {
+app.get('/hoteles', cors(corsOptions), async (req, res) => {
+    await startExtrationData(15, 17, 04)
+    res.send( DataResults )
+})
 
+const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
+    const browser = await puppeteer.launch(
+        {
+            headless: false,
+        }
+    );
+    const page = await browser.newPage(
+        {
+            waitUntil: 'domcontentLoaded'
+        }
+    );
+
+
+    const urlsNewData = buscarFechasyReemplazarlas(dataCheckIn, dataCheckOut, month, urls)
     try {
-        const browser = await puppeteer.launch(
-            {
-                headless: true,
-                args: [ // Disable Chromium's unnecessary SUID sandbox.
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                ]
-            }
-        )
-        const page = await browser.newPage();
-        await page.goto(`https://www.booking.com/searchresults.es.html?ss=Centro%20de%20B%C3%BAzios&ssne=Centro%20de%20B%C3%BAzios&ssne_untouched=Centro%20de%20B%C3%BAzios&label=gog235jc-1DCAEoggI46AdIClgDaCCIAQGYAQq4AQbIAQzYAQPoAQH4AQKIAgGoAgO4AsyBqJEGwAIB0gIkZGQwMDdjYzgtNWQ0ZS00MTgwLThjYTktMDk2Y2QyODA3YTRk2AIE4AIB&sid=5b27a9f97c9ae14d33519b42c28a6961&aid=397594&lang=es&sb=1&src_elem=sb&src=searchresults&dest_id=3167&dest_type=district&checkin=2022-03-11&checkout=2022-03-13&group_adults=2&no_rooms=1&group_children=0&sb_travel_purpose=leisure`)
-    //  await page.screenshot({ path: 'example.png' });  esse codigo aqui tira uma foto do site
+        console.clear()
+        console.log(`Começando a extração de dados de ${urlsNewData.length} estabelecimentos`)
 
-        const pageContent = await page.evaluate(() => {
-            return {
-                hotel: document.querySelector('.fde444d7ef').innerHTML,
-             
-                localizacao: document.querySelector('.af1ddfc958').innerHTML,
-                   /*
-                suite: document.querySelector('._c5d12bf22').innerHTML,
-                pontoacao: document.querySelector('._9c5f726ff').innerHTML,
-                cafedamanha: document.querySelector('.c79699a040').innerHTML,
-                diarias: document.querySelector('._4abc4c3d5').innerHTML,
-                precoTotal: document.querySelector('._e885fdc12').innerHTML,
-                */
-          
-                totaldeEstabelecimentos: document.querySelector('._30227359d').innerHTML,
-            }
-        })  
-                console.log(pageContent)
-                const novoQuery = JSON.stringify(pageContent)
+        for (let i = 0; i < urlsNewData.length; i++) {
             
-                await browser.close();
+            console.log({ urlsNewData: urlsNewData[i]})
+            await page.goto(urlsNewData[i]);
+
+            console.log('')
+            console.log(`Pagina numero ${[i]}`)
+
+        
+            const data = await page.evaluate(() => {    
+                let textImg = document.querySelector('.bh-photo-grid [data-preview-image-layout] img')?.src
+                let textHotel = document.querySelector('.hp__hotel-title h2')?.innerText
+                let textLocalizacao = document.querySelector('.address .hp_address_subtitle')?.innerText
+                let textSuite = document.querySelector('tbody tr .hprt-roomtype-link')?.innerText
+                let textPontoacao = document.querySelector('.hp-gallery-review [data-review-score] [aria-label]')?.innerText
+                let textCafedamanha = document.querySelector('tbody tr .hprt-table-cell .bui-list__body')?.innerText
+                let textDiarias = document.querySelector(' [data-component] .sb-dates__los')?.innerText
+                let textPrecototal = document.querySelector('tbody tr .hprt-price-block span')?.innerText
                 
-             
+                function isaNull(selectorDOM) {
+                    const datos = selectorDOM == `TypeError: Cannot read properties of null (reading 'innerText')` || selectorDOM == null ? 'Valor não encontrado' : selectorDOM
+                    return datos
+                }
 
-        response.send(` ${novoQuery}`)
+                return {
+                    backgroundImg: isaNull(textImg),
+                    hotel: isaNull(textHotel),
+                    localizacao: isaNull(textLocalizacao),
+                    suite: isaNull(textSuite),
+                    pontoacao: isaNull(textPontoacao),
+                    cafedamanha: isaNull(textCafedamanha),
+                    diarias: isaNull(textDiarias),  
+                    precoTotal: isaNull(textPrecototal),     
+                }
+            })
+
+
+           DataResults.push(data)
+           console.log(data) 
+           console.log(``)
+           console.log(`-------------->`)
+            //const dataHotel = JSON.stringify(data) 
+        }
+
+        console.log(DataResults)
+
     } 
-    
-    catch (e) {
-        console.log(`Mensaje de error: ${e}`)
+
+    catch (error) {
+        console.log(`Este es el error: ${error}`)
     }
-})
+   
+    await browser.close();
+}
 
-app.listen(3000, () => {
-    console.log(`Servidor inicializado y escuchando desde el puerto 3000`)
-})
+//startExtrationData(08, 10, 04)
 
+
+app.listen(port, () => {
+    console.log('Server ejecutandose en el puerto ' + port)
+})
