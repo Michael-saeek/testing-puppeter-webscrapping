@@ -7,7 +7,7 @@ let DataResults = [];
 const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
     const browser = await puppeteer.launch(
         {
-            headless: false,
+            args: ['--no-sandbox'],
         }
     );
     const page = await browser.newPage(
