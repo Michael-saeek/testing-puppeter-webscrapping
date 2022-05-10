@@ -3,9 +3,8 @@ const express = require('express');
 const app = express() 
 const morgan = require('morgan')
 const cors = require('cors')
-const port = 80;
-const { router } = require('./router/index')
-
+const port = process.env.PORT || 80;
+const { router } = require('./router/index.router')
 
 //Middlewars
 app.use(morgan('dev'));
@@ -14,7 +13,7 @@ app.use(cors());
 
 
 //Routes
-app.use('/index', router)
+app.use('/hoteles', router)
 
 
 //Outros

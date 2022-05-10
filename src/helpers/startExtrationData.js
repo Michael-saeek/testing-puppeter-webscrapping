@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
-const urls = require('./urls.json') // 
-const buscarFechasyReemplazarlas = require('./searchAndReplace')
+const urls = require('../urls.json') // 
+const { buscarFechasyReemplazarlas } = require('./searchAndReplace')
 
 let DataResults = [];
 
@@ -69,10 +69,9 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
            console.log(data) 
            console.log(``)
            console.log(`-------------->`)
-            //const dataHotel = JSON.stringify(data) 
+            
         }
-
-        console.log(DataResults)
+       
 
     } 
 
@@ -81,6 +80,8 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
     }
    
     await browser.close();
+    const dataHotel = JSON.stringify(DataResults) 
+    return dataHotel
 }
 
 module.exports = {
