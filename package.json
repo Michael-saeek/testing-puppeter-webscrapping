@@ -19,13 +19,13 @@
   },
   "homepage": "https://github.com/Michael-saeek/testing-puppeter-webscrapping#readme",
   "dependencies": {
-    "axios": "^0.26.1",
+    "axios": "^0.27.2",
     "cors": "^2.8.5",
-    "express": "^4.17.3",
+    "express": "^4.18.1",
     "morgan": "^1.10.0",
-    "puppeteer": "^13.5.1"
+    "puppeteer": "^14.1.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.16"
   }
 }
