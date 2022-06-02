@@ -8,7 +8,8 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
     const browser = await puppeteer.launch(
         {
             headless: true,
-            args: ['--no-sandbox'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--use-gl=egl'],
+         
         }
     );
     const page = await browser.newPage();
@@ -30,29 +31,22 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
     const versionB = await browser.version()
 
     
-
-
     const urlsNewData = buscarFechasyReemplazarlas(dataCheckIn, dataCheckOut, month, urls)
 
     console.log(urlsNewData)
 
-    try {
-        console.clear()
-   
-        console.log(`Começando a extração de dados de ${urlsNewData.length} estabelecimentos`)
   
-
+        console.clear()
+        console.log(`Começando a extração de dados de ${urlsNewData.length} estabelecimentos`)
         console.log(versionB)
 
         for (let i = 0; i < urlsNewData.length; i++) {
             await page.goto(urlsNewData[i], { waitUntil: 'domcontentloaded'});
-            await page.waitForTimeout(2500);
+
           //  await page.screenshot({ path: './src/imgs/img1.jpeg', })
         
             console.log('')
-            console.log(`Pagina: ${urlsNewData[i]}`)
-
-
+    
             const data = await page.evaluate( async () => {    
                 let textImg = document.querySelector('.bh-photo-grid [data-preview-image-layout] img')?.src
                 let textHotel = document.querySelector('.hp__hotel-title h2')?.innerText
@@ -86,14 +80,9 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
            console.log(`-------------->`)
        
         }
-        
 
     } 
  
-
-    catch (error) {
-        console.log(`Este es el error: ${error}`)
-    }
    
     await browser.close();
     const dataHotel = JSON.stringify(DataResults) 

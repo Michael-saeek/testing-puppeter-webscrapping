@@ -3,7 +3,7 @@ const express = require('express');
 const app = express() 
 const morgan = require('morgan')
 const cors = require('cors')
-const port = process.env.PORT || 80;
+const port = 3000 || 80;
 const { router } = require('./router/index.router')
 
 //Middlewars
@@ -13,7 +13,8 @@ app.use(cors());
 
 
 //Routes
-app.use('/hoteles', router)
+//?dayIn=13&dayOut=15&month=05 enviar querys para continuar
+app.use('/startExtrationData', router)
 
 
 //Outros

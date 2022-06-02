@@ -2,14 +2,10 @@
 const { Router } = require('express')
 const router = Router()
 const cors = require('cors')
-const { 
-  getExtrationData, 
-  /*
-  postData, 
-  putData,
-  deleteData 
-  */
-} = require('../controllers/extration')
+
+const { getDataFromBooking, 
+
+} = require('../controllers/scraperData')
 
 
 const corsOptions = {
@@ -21,12 +17,12 @@ const corsOptions = {
 
 
 //Using the routes
-router.get('/', cors(corsOptions), getExtrationData)
+router.get('/', cors(corsOptions), getDataFromBooking)
 
 /*
-router.post('/hoteles', cors(corsOptions), postData)
-router.put('/hoteles', cors(corsOptions), putData)
-router.delete('/hoteles', cors(corsOptions), deleteData)
+router.post('/', cors(corsOptions), postData)
+router.put('/', cors(corsOptions), putData)
+router.delete('/', cors(corsOptions), deleteData)
 */
 
 
