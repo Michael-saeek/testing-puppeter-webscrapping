@@ -34,8 +34,6 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
     const urlsNewData = buscarFechasyReemplazarlas(dataCheckIn, dataCheckOut, month, urls)
 
     console.log(urlsNewData)
-
-  
         console.clear()
         console.log(`Começando a extração de dados de ${urlsNewData.length} estabelecimentos`)
         console.log(versionB)
@@ -80,15 +78,13 @@ const startExtrationData = async (dataCheckIn, dataCheckOut, month) => {
            console.log(`-------------->`)
        
         }
-
+        
+        await browser.close();
+        const dataHotel = JSON.stringify(DataResults) 
+        return dataHotel
+    
     } 
  
-   
-    await browser.close();
-    const dataHotel = JSON.stringify(DataResults) 
-  
-    return dataHotel
-}
 
 module.exports = {
     startExtrationData,

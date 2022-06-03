@@ -1,6 +1,6 @@
 // declaration of the routes
 const { Router } = require('express')
-const router = Router()
+const routerGetData = Router()
 const cors = require('cors')
 
 const { getDataFromBooking, 
@@ -15,9 +15,16 @@ const corsOptions = {
     "optionsSuccessStatus": 200
   }
 
+routerGetData.get('/', (req, res) => {
+
+        res.render('home' )
+
+    
+})
+
 
 //Using the routes
-router.get('/', cors(corsOptions), getDataFromBooking)
+routerGetData.get('/startExtrationData', cors(corsOptions), getDataFromBooking)
 
 /*
 router.post('/', cors(corsOptions), postData)
@@ -31,6 +38,4 @@ router.delete('/', cors(corsOptions), deleteData)
 
 
 //exporting router
-module.exports = {
-    router
-}
+module.exports = routerGetData
